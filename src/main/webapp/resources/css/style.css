@@ -1,0 +1,27 @@
+#mainPage {
+    padding-top: 70px;
+    margin-bottom: 400px;
+}
+
+.navbar {
+    background: transparent;
+    border: none;
+}
+
+.navbar li {
+    color: #000
+}
+
+body {
+    background-size: 100%;
+    background-attachment: fixed;
+}
+
+.submitButton {
+    background-color: Transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
