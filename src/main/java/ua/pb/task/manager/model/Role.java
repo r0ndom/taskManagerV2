@@ -6,6 +6,7 @@ public enum Role  {
     ROLE_MANAGER("Менеджер"),
     ROLE_ADMIN("Администратор"),
     ROLE_TESTER("Тестировщик"),
+    ROLE_GUEST("Гость"),
     ROLE_CONTROL("Control");
 
     private final String roleViewName;
@@ -25,6 +26,6 @@ public enum Role  {
 
 
     public static Role[] getPermittedValues() {
-        return new Role[] {ROLE_ADMIN, ROLE_DEVELOPER, ROLE_MANAGER, ROLE_TESTER};
+        return new Role[] {ROLE_ADMIN, ROLE_DEVELOPER, ROLE_MANAGER, ROLE_TESTER, ROLE_GUEST};
     }
 }

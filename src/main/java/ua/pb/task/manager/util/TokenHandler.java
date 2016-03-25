@@ -1,4 +1,4 @@
-package ua.pb.task.manager.service;
+package ua.pb.task.manager.util;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;

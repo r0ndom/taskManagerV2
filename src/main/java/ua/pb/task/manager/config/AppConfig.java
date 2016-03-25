@@ -7,9 +7,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 * Created by Mednikov on 26.02.2016.
 */
 @Configuration
-@ComponentScan(basePackages = {"ua.pb.task.manager.dao", "ua.pb.task.manager.form",
+@ComponentScan(basePackages = {"ua.pb.task.manager.repository", "ua.pb.task.manager.form",
         "ua.pb.task.manager.service"})
-@Import({ActivitiConfig.class, DataSourceConfig.class})
+@Import({ActivitiConfig.class, DataSourceConfig.class, GoogleConfig.class})
 public class AppConfig {
 
     @Bean

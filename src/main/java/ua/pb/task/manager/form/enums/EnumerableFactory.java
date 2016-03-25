@@ -1,6 +1,6 @@
 package ua.pb.task.manager.form.enums;
 
-import ua.pb.task.manager.dao.UserDao;
+import ua.pb.task.manager.repository.mapper.UserMapper;
 import org.activiti.engine.form.FormProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class EnumerableFactory {
     public final static String USER_ENUM = "users";
 
     @Autowired
-    private UserDao userDao;
+    private UserMapper userMapper;
 
     public Enumerable buildEnum(FormProperty formProperty) {
         String type = formProperty.getType().getName();
@@ -26,7 +26,7 @@ public class EnumerableFactory {
                 break;
 
             case USER_ENUM:
-                //enumerable = new UserEnum(userDao.findAllMap());
+                //enumerable = new UserEnum(userMapper.findAllMap());
                 break;
 
             default:

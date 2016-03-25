@@ -1,26 +1,24 @@
 package ua.pb.task.manager.service;
 
-import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.TokenResponse;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.plus.Plus;
+import com.google.api.services.plus.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ua.pb.task.manager.dao.UserDao;
+import ua.pb.task.manager.repository.UserRepository;
+import ua.pb.task.manager.model.Role;
+import ua.pb.task.manager.model.User;
+import ua.pb.task.manager.service.session.SessionStorage;
+import ua.pb.task.manager.util.RequestUtil;
 
-import javax.annotation.PostConstruct;
-import java.awt.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,80 +27,93 @@ import java.util.List;
 @Service
 public class AuthService {
 
+    @Value("${google.application.name}")
+    private String APPLICATION_NAME;
+
+    @Value("${google.plus.default.user}")
+    private String DEFAULT_USER;
+
+    @Value("${default.host.url}")
+    private String REDIRECT_URL;
+
     @Autowired
-    private TokenHandler handler;
+    private JsonFactory JSON_FACTORY;
 
-    private static final String APPLICATION_NAME = "taskmanager-1238";
+    @Autowired
+    private HttpTransport HTTP_TRANSPORT;
 
-    private static final String REDIRECT_URL = "http://localhost:8080/auth";
+    @Autowired
+    private GoogleCredentialStorage storage;
 
-    private static final String SPREADSHEETS_URL = "https://spreadsheets.google.com/feeds/";
+    @Autowired
+    private HttpServletResponse response;
 
-    private static final String PERSONAL_INFO_URL = "https://www.googleapis.com/auth/userinfo.profile";
+    @Autowired
+    private HttpServletRequest request;
 
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
+    @Autowired
+    private RequestUtil requestUtil;
 
-    private static JsonFactory JSON_FACTORY;
+    @Autowired
+    private UserRepository userRepository;
 
-    private static HttpTransport HTTP_TRANSPORT;
+    @Autowired
+    private SessionStorage<Long> sessionStorage;
 
-    private static List<String> SCOPES;
-
-    @PostConstruct
-    public void init() {
-        try {
-            File DATA_STORE_DIR = new File(System.getProperty("user.home"),
-                    ".credentials/drive-java-quickstart.json");
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
-            JSON_FACTORY = JacksonFactory.getDefaultInstance();
-            SCOPES = Arrays.asList(DriveScopes.DRIVE, SPREADSHEETS_URL, PERSONAL_INFO_URL);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+    public void register() throws IOException {
+        Credential credential = storage.getNewInstance();
+        Plus plus = getPlusService(credential);
+        Person profile = plus.people().get(DEFAULT_USER).execute();
+        User user = User.newBuilder()
+                .setEmails(getStringEmails(profile.getEmails()))
+                .addRole(Role.ROLE_GUEST)
+                .build();
+        storage.store(user.getId(), credential);
+        userRepository.store(user);
+        String sessionKey = sessionStorage.storeObject(user.getId());
+        requestUtil.updateOrCreateSessionKey(request, response, User.USER_KEY_NAME_COOKIE, sessionKey, "/");
+        response.sendRedirect(REDIRECT_URL);
     }
 
-    private Credential authorize(Long id) throws IOException {
-
-        InputStream in = AuthService.class.getResourceAsStream("/client_secret.json");
-        GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        GoogleAuthorizationCodeFlow flow =
-                new GoogleAuthorizationCodeFlow.Builder(
-                        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                        .setDataStoreFactory(DATA_STORE_FACTORY)
-                        .setAccessType("offline")
-                        .build();
-        Credential credential = flow.loadCredential(String.valueOf(id));
-        if (credential != null
-                && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
-            return credential;
-        }
-
-        AuthorizationCodeRequestUrl authorizationUrl =
-                flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URL);
-        try {
-            if (Desktop.isDesktopSupported()) {
-                Desktop desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    System.out.println("Attempting to open that address in the default browser now...");
-                    desktop.browse(URI.create(authorizationUrl.build()));
-                }
+    public void auth() {
+        Cookie cookie = requestUtil.getLastSessionCookieByKey(request, User.USER_KEY_NAME_COOKIE);
+        String key = getSessionKeyByCookieOrAttribute(cookie);
+        if (key != null) {
+            Long id = sessionStorage.getObject(key);
+            if (id == null) {
+                requestUtil.deleteAllCookieByKey(request, User.USER_KEY_NAME_COOKIE);
+                response.addHeader("SESSION", "TIMEOUT");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            } else {
+                sessionStorage.storeObject(key, id);
             }
-        } catch (IOException | InternalError e) {
-            e.printStackTrace();
+        } else {
+            response.addHeader("SESSION", "UNAUTHORIZED");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
-        String code = handler.getToken();
-        TokenResponse response = flow.newTokenRequest(code).setRedirectUri(REDIRECT_URL).execute();
-        return flow.createAndStoreCredential(response, String.valueOf(id));
     }
 
-    private Drive getDriveService(Credential credential) throws IOException {
-        return new Drive.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, credential)
+
+    private Plus getPlusService(Credential credential) {
+        return new Plus.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
+    }
+
+    private String getSessionKeyByCookieOrAttribute(Cookie sessionCookie) {
+        String sessionKey = String.valueOf(request.getAttribute(User.USER_KEY_NAME_COOKIE));
+        if (sessionKey == null || sessionKey.trim().isEmpty() || "null".equals(sessionKey)) {
+            sessionKey = (sessionCookie != null) ? sessionCookie.getValue() : null;
+        }
+        return sessionKey;
+    }
+
+    private List<String> getStringEmails(List<Person.Emails> emails) {
+        List<String> result = new ArrayList<>();
+        for (Person.Emails email : emails) {
+            result.add(email.getValue());
+        }
+        return result;
     }
 
 }

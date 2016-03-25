@@ -23,7 +23,7 @@ import java.io.IOException;
 */
 @Configuration
 @PropertySource("classpath:db.properties")
-@MapperScan("ua.pb.task.manager.dao.mapper")
+@MapperScan("ua.pb.task.manager.repository.mapper")
 @EnableTransactionManagement
 public class DataSourceConfig {
 

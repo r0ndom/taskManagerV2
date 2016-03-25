@@ -2,4 +2,8 @@
 *.iml
 /target/
 db.properties
+/build/
+/classes/
+/out/
+
 
