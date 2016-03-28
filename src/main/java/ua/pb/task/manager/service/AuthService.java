@@ -19,7 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Mednikov on 09.03.2016.
@@ -101,8 +103,8 @@ public class AuthService {
         response.sendRedirect(REDIRECT_URL);
     }
 
-    private List<String> getStringEmails(List<Person.Emails> emails) {
-        List<String> result = new ArrayList<>();
+    private Set<String> getStringEmails(List<Person.Emails> emails) {
+        Set<String> result = new HashSet<>();
         for (Person.Emails email : emails) {
             result.add(email.getValue());
         }

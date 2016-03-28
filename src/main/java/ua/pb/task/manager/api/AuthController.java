@@ -9,6 +9,7 @@ import ua.pb.task.manager.service.AuthService;
 import ua.pb.task.manager.util.TokenHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -43,6 +44,6 @@ public class AuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView loginPage() {
-        return new ModelAndView("login");
+        return new ModelAndView("auth/login");
     }
 }

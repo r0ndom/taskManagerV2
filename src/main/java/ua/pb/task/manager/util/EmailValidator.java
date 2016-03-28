@@ -1,5 +1,6 @@
 package ua.pb.task.manager.util;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ public class EmailValidator {
 	}
 
 
-	public static boolean validateList(final List<String> list) {
+	public static boolean validateList(final Collection<String> list) {
 		for (String email : list) {
 			if (!validate(email)) {
 				return false;

@@ -1,5 +1,6 @@
 package ua.pb.task.manager.model;
 
+import ua.pb.task.manager.model.dto.UserDto;
 import ua.pb.task.manager.util.EmailValidator;
 import ua.pb.task.manager.util.KeyGenerator;
 
@@ -13,13 +14,13 @@ public class User
     public static final String USER_KEY_NAME_COOKIE = "tm";
 
     private Long id;
-    private List<String> emails;
+    private Set<String> emails;
     private Set<Role> roles;
 
     private User() {
     }
 
-    public List<String> getEmails() {
+    public Set<String> getEmails() {
         return emails;
     }
 
@@ -35,10 +36,26 @@ public class User
         return new User().new Builder();
     }
 
+
+    //TODO fix this dirty hook
+    public static User newInstance(List<UserDto> list) {
+        User user = new User();
+        Set<String> emails = new HashSet<>();
+        Set<Role> roles = new HashSet<>();
+        for (UserDto dto : list) {
+            user.id = dto.getId();
+            emails.add(dto.getEmail());
+            roles.add(dto.getRole());
+        }
+        user.emails = emails;
+        user.roles = roles;
+        return user;
+    }
+
     public class Builder {
 
         private Builder() {
-            User.this.emails = new ArrayList<>();
+            User.this.emails = new HashSet<>();
             User.this.roles = new HashSet<>();
         }
 
@@ -55,7 +72,7 @@ public class User
             return this;
         }
 
-        public Builder setEmails(List<String> emails) {
+        public Builder setEmails(Set<String> emails) {
             checkArgument(EmailValidator.validateList(emails), "Not valid email list");
             User.this.emails = emails;
             return this;
@@ -74,8 +91,5 @@ public class User
             User.this.id = KeyGenerator.getId();
             return User.this;
         }
-
     }
-
-
 }

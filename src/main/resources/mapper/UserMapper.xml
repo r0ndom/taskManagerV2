@@ -2,40 +2,39 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ua.pb.task.manager.mapper.UserMapper" >
+<mapper namespace="ua.pb.task.manager.repository.mapper.UserMapper" >
 
-    <!--<resultMap id="getUserResultMap" type="ua.pb.task.manager.model.User">-->
-        <!--<id property="id" column="ID"/>-->
-        <!--<result property="role" column="ROLE" javaType="ua.pb.task.manager.model.Role" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>-->
-    <!--</resultMap>-->
+    <resultMap id="getUserDtoResultMap" type="ua.pb.task.manager.model.dto.UserDto">
+        <id property="id" column="users.id"/>
+        <result property="email" column="emails.email"/>
+        <result property="role" column="roles.role" javaType="ua.pb.task.manager.model.Role" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+    </resultMap>
 
+    <select id="findUserByEmail" resultMap="getUserDtoResultMap">
+        select * from USERS users
+        INNER JOIN EMAILS emails
+        on users.id = emails.user_id
+        INNER JOIN ROLES roles
+        on  users.id = roles.user_id
+        WHERE emails.email = #{email}
+    </select>
 
-    <!--<select id="get" resultMap="getUserResultMap">-->
-        <!--select * from users where id = #{id};-->
-    <!--</select>-->
+    <insert id="storeUser" parameterType="ua.pb.task.manager.model.User">
+        INSERT INTO USERS(ID) VALUES (#{id});
+    </insert>
 
-    <!--<select id="findAll" resultMap="getUserResultMap">-->
-        <!--select * from users WHERE role!='ROLE_CONTROL';-->
-    <!--</select>-->
+    <insert id="storeRoles" parameterType="ua.pb.task.manager.model.User">
+        INSERT ALL
+        <foreach item="role" index="index" collection="roles">
+            INTO ROLES (user_id, role) VALUES (#{id}, #{role})
+        </foreach>
+    </insert>
 
-    <!--<select id="findByLdap" resultMap="getUserResultMap">-->
-        <!--select * from USERS where LDAP = #{ldap}-->
-    <!--</select>-->
-
-    <!--<select id="findByRole" resultMap="getUserResultMap">-->
-        <!--select * from USERS where ROLE = #{role}-->
-    <!--</select>-->
-
-    <!--<insert id="create" parameterType="ua.pb.task.manager.model.User">-->
-        <!--INSERT INTO USERS(LDAP, FIRST_NAME, LAST_NAME, PASSWORD, ROLE) VALUES (#{ldap}, #{firstName}, #{lastName}, #{password}, #{role});-->
-    <!--</insert>-->
-
-    <!--<update id="update" parameterType="ua.pb.task.manager.model.User">-->
-        <!--UPDATE USERS SET LDAP=#{ldap}, FIRST_NAME=#{firstName}, LAST_NAME=#{lastName}, PASSWORD=#{password}, ROLE=#{role} WHERE id=#{id};-->
-    <!--</update>-->
-
-    <!--<delete id="delete">-->
-        <!--delete from users where id=#{id};-->
-    <!--</delete>-->
+    <insert id="storeEmails" parameterType="ua.pb.task.manager.model.User">
+        INSERT ALL
+        <foreach item="email" index="index" collection="emails">
+            INTO EMAILS (user_id, email) VALUES (#{id}, #{email})
+        </foreach>
+    </insert>
 
 </mapper>

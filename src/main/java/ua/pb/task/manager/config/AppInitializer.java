@@ -7,34 +7,37 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import java.util.Set;
 
-public class AppInitializer implements WebApplicationInitializer {
+public class AppInitializer extends  AbstractAnnotationConfigDispatcherServletInitializer {
 
-    @Override
-    public void onStartup(ServletContext servletContext) {
-        AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
-        rootContext.register(AppConfig.class);
-        rootContext.refresh();
+        @Override
+        protected Class<?>[] getRootConfigClasses() {
+            return new Class[]{AppConfig.class};
+        }
 
-        servletContext.addListener(new ContextLoaderListener(rootContext));
-        servletContext.setInitParameter("defaultHtmlEscape", "true");
+        @Override
+        protected Class<?>[] getServletConfigClasses() {
+            return new Class<?>[]{WebConfig.class, AspectConfig.class};
+        }
 
-        AnnotationConfigWebApplicationContext mvcContext = new AnnotationConfigWebApplicationContext();
-        mvcContext.register(WebConfig.class);
-        ServletRegistration.Dynamic appServlet = servletContext.addServlet(
-                "appServlet", new DispatcherServlet(mvcContext));
-        appServlet.setLoadOnStartup(1);
-        Set<String> mappingConflicts = appServlet.addMapping("/");
-        FilterRegistration.Dynamic fr = servletContext.addFilter("encodingFilter",
-                new CharacterEncodingFilter());
-        fr.setInitParameter("encoding", "UTF-8");
-        fr.setInitParameter("forceEncoding", "true");
-        fr.addMappingForUrlPatterns(null, true, "/*");
-    }
+        @Override
+        protected String[] getServletMappings() {
+            return new String[]{"/"};
+        }
+
+        @Override
+        protected Filter[] getServletFilters() {
+            CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+            characterEncodingFilter.setEncoding("UTF-8");
+            characterEncodingFilter.setForceEncoding(true);
+            return new Filter[] { characterEncodingFilter };
+        }
 
 }

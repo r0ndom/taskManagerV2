@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import ua.pb.task.manager.aspect.ApplyOrder;
 import ua.pb.task.manager.aspect.annotation.SessionAccess;
 import ua.pb.task.manager.model.User;
 import ua.pb.task.manager.repository.session.SessionStorage;
@@ -26,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 @Aspect
+@Order(ApplyOrder.AUTH)
 public class SessionAccessAspect {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAccessAspect.class);
 
@@ -35,30 +39,27 @@ public class SessionAccessAspect {
     @Autowired
     private RequestUtil requestUtil;
 
-    @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
-    private HttpServletResponse response;
-
-    @Value("${default.host.url}")
-    private String REDIRECT_URL;
+//    @Autowired
+//    private HttpServletRequest request;
+//
+//    @Autowired
+//    private HttpServletResponse response;
 
     @Value("${login.failed.url}")
     private String LOGIN_FAILED;
 
 
-    @Pointcut("within(@ua.pb.statements.aspect.annotation.SessionAccessControl *)")
+    @Pointcut("within(@ua.pb.task.manager.aspect.annotation.SessionAccess *)")
     public void sessionAccess() {
     }
 
 
 
-    @Around("sessionAccess()"
-    )
+    @Around("sessionAccess()")
     public void checkAccess(ProceedingJoinPoint call) throws Throwable {
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         LOG.info("map by req(SessionAccess) - {}", request.getParameterMap());
-        LOG.trace("ASPECT :: SessionAccessAspect - checkAccess ::");
 
         LOG.info("SESSION ASPECT");
 
@@ -70,15 +71,13 @@ public class SessionAccessAspect {
                 requestUtil.deleteAllCookieByKey(request, User.USER_KEY_NAME_COOKIE);
                 response.addHeader("SESSION", "TIMEOUT");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.sendRedirect(LOGIN_FAILED);
             } else {
                 sessionStorage.storeObject(key, id);
-                response.sendRedirect(REDIRECT_URL);
+                call.proceed();
             }
         } else {
             response.addHeader("SESSION", "UNAUTHORIZED");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.sendRedirect(LOGIN_FAILED);
         }
     }
 }

@@ -27,7 +27,7 @@ import java.util.List;
  * Created by Mednikov on 25.03.2016.
  */
 @Configuration
-@PropertySource("classpath:google.properties")
+@PropertySource("classpath:auth.properties")
 public class GoogleConfig {
 
     @Value("${spreadsheets.url}")

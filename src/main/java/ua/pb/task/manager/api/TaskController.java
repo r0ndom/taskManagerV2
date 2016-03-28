@@ -3,17 +3,17 @@ package ua.pb.task.manager.api;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import ua.pb.task.manager.aspect.annotation.SessionAccess;
 
 /**
- * Created by Mike on 3/28/2016.
+ * Created by Mednikov on 28.03.2016.
  */
 @Controller
-@RequestMapping("/error")
-public class ErrorController {
+@SessionAccess
+public class TaskController {
 
     @RequestMapping("/")
-    public ModelAndView showErrorPage() {
-        return new ModelAndView("common/error");
+    public ModelAndView index() {
+        return new ModelAndView("tasks/tasks");
     }
-
 }

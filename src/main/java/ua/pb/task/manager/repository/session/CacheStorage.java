@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import ua.pb.task.manager.util.KeyGenerator;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,10 +27,11 @@ public class CacheStorage<T> implements Storage<T> {
 
     private Cache<Object, Object> storage;
 
-    public CacheStorage() {
+    @PostConstruct
+    public void init() {
         storage = CacheBuilder.newBuilder()
                 .maximumSize(1000)
-                .expireAfterAccess(456, TimeUnit.SECONDS)
+                .expireAfterAccess(defaultStoreTime, TimeUnit.SECONDS)
                 .build();
     }
 

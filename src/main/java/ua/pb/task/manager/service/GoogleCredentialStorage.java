@@ -73,11 +73,6 @@ public class GoogleCredentialStorage {
         return credential;
     }
 
-    public Long getUserByCredential(Credential credential) {
-        Long id = null;
-        return id;
-    }
-
     private GoogleClientSecrets getSecrets() throws IOException {
         InputStream in = AuthService.class.getResourceAsStream("/client_secret.json");
         return GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
