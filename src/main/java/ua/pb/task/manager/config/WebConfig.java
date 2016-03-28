@@ -12,7 +12,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("ua.pb.task.manager.controller")
+@ComponentScan("ua.pb.task.manager.api")
 public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
@@ -29,16 +29,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public InternalResourceViewResolver jspViewResolver() {
         InternalResourceViewResolver bean = new InternalResourceViewResolver();
         bean.setPrefix("WEB-INF/pages/");
-        bean.setSuffix(".jsp");
+        bean.setSuffix(".html");
         return bean;
-    }
-
-
-    @Bean(name = "messageSource")
-    public ResourceBundleMessageSource getMessageSource() {
-        ResourceBundleMessageSource resource = new ResourceBundleMessageSource();
-        resource.setBasename("classpath:messages");
-        resource.setDefaultEncoding("UTF-8");
-        return resource;
     }
 }

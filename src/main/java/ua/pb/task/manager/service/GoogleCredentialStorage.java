@@ -15,9 +15,11 @@ import org.springframework.stereotype.Service;
 import ua.pb.task.manager.util.TokenHandler;
 
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 /**
  * Created by Mednikov on 25.03.2016.
@@ -71,6 +73,11 @@ public class GoogleCredentialStorage {
         return credential;
     }
 
+    public Long getUserByCredential(Credential credential) {
+        Long id = null;
+        return id;
+    }
+
     private GoogleClientSecrets getSecrets() throws IOException {
         InputStream in = AuthService.class.getResourceAsStream("/client_secret.json");
         return GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
@@ -80,7 +87,20 @@ public class GoogleCredentialStorage {
         AuthorizationCodeRequestUrl authorizationUrl =
                 flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URL);
 
-        response.sendRedirect(authorizationUrl.build());
+        //response.sendRedirect(authorizationUrl.build());
+
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    System.out.println("Attempting to open that address in the default browser now...");
+                    desktop.browse(URI.create(authorizationUrl.build()));
+                }
+            }
+        } catch (IOException e) {
+        } catch (InternalError e) {
+
+        }
 
         String code = handler.getToken();
         return flow.newTokenRequest(code).setRedirectUri(REDIRECT_URL).execute();

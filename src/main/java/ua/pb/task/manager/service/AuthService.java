@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import ua.pb.task.manager.repository.UserRepository;
 import ua.pb.task.manager.model.Role;
 import ua.pb.task.manager.model.User;
-import ua.pb.task.manager.service.session.SessionStorage;
+import ua.pb.task.manager.repository.session.SessionStorage;
 import ua.pb.task.manager.util.RequestUtil;
 
 import javax.servlet.http.Cookie;
@@ -35,6 +35,9 @@ public class AuthService {
 
     @Value("${default.host.url}")
     private String REDIRECT_URL;
+
+    @Value("${login.failed.url}")
+    private String LOGIN_FAILED;
 
     @Autowired
     private JsonFactory JSON_FACTORY;
@@ -62,35 +65,26 @@ public class AuthService {
 
     public void register() throws IOException {
         Credential credential = storage.getNewInstance();
-        Plus plus = getPlusService(credential);
-        Person profile = plus.people().get(DEFAULT_USER).execute();
+        Person profile = getPlusProfile(credential);
         User user = User.newBuilder()
                 .setEmails(getStringEmails(profile.getEmails()))
                 .addRole(Role.ROLE_GUEST)
                 .build();
-        storage.store(user.getId(), credential);
         userRepository.store(user);
-        String sessionKey = sessionStorage.storeObject(user.getId());
-        requestUtil.updateOrCreateSessionKey(request, response, User.USER_KEY_NAME_COOKIE, sessionKey, "/");
-        response.sendRedirect(REDIRECT_URL);
+        createSession(user, credential);
     }
 
-    public void auth() {
-        Cookie cookie = requestUtil.getLastSessionCookieByKey(request, User.USER_KEY_NAME_COOKIE);
-        String key = getSessionKeyByCookieOrAttribute(cookie);
-        if (key != null) {
-            Long id = sessionStorage.getObject(key);
-            if (id == null) {
-                requestUtil.deleteAllCookieByKey(request, User.USER_KEY_NAME_COOKIE);
-                response.addHeader("SESSION", "TIMEOUT");
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            } else {
-                sessionStorage.storeObject(key, id);
-            }
-        } else {
-            response.addHeader("SESSION", "UNAUTHORIZED");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        }
+    public void auth() throws IOException {
+        Credential credential = storage.getNewInstance();
+        Person profile = getPlusProfile(credential);
+        String email = getMainEmail(profile.getEmails());
+        User user = userRepository.findByEmail(email);
+        createSession(user, credential);
+    }
+
+    private Person getPlusProfile(Credential credential) throws IOException {
+        Plus plus = getPlusService(credential);
+        return plus.people().get(DEFAULT_USER).execute();
     }
 
 
@@ -100,12 +94,11 @@ public class AuthService {
                 .build();
     }
 
-    private String getSessionKeyByCookieOrAttribute(Cookie sessionCookie) {
-        String sessionKey = String.valueOf(request.getAttribute(User.USER_KEY_NAME_COOKIE));
-        if (sessionKey == null || sessionKey.trim().isEmpty() || "null".equals(sessionKey)) {
-            sessionKey = (sessionCookie != null) ? sessionCookie.getValue() : null;
-        }
-        return sessionKey;
+    private void createSession(User user, Credential credential) throws IOException {
+        storage.store(user.getId(), credential);
+        String sessionKey = sessionStorage.storeObject(user.getId());
+        requestUtil.updateOrCreateSessionKey(request, response, User.USER_KEY_NAME_COOKIE, sessionKey, "/");
+        response.sendRedirect(REDIRECT_URL);
     }
 
     private List<String> getStringEmails(List<Person.Emails> emails) {
@@ -114,6 +107,10 @@ public class AuthService {
             result.add(email.getValue());
         }
         return result;
+    }
+
+    private String getMainEmail(List<Person.Emails> emails) {
+        return emails.get(0).getValue();
     }
 
 }

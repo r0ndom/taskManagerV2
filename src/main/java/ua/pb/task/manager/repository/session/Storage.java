@@ -1,4 +1,4 @@
-package ua.pb.task.manager.service.session;
+package ua.pb.task.manager.repository.session;
 
 
 public interface Storage<T> {

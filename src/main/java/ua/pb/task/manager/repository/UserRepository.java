@@ -17,4 +17,8 @@ public class UserRepository {
     public void store(User user) {
         mapper.store(user);
     }
+
+    public User findByEmail(String email) {
+        return mapper.findByEmail(email);
+    }
 }

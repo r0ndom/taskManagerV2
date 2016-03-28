@@ -8,9 +8,10 @@ import java.util.List;
 
 public interface UserMapper {
     void store(User user);
-    User load(String id);
-    void update(User user);
-    void delete(String id);
-    List<User> findAll();
-    List<User> findByRole(Role role);
+    User findByEmail(String email);
+//    User load(String id);
+//    void update(User user);
+//    void delete(String id);
+//    List<User> findAll();
+//    List<User> findByRole(Role role);
 }

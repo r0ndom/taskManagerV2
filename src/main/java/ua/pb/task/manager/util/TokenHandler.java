@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Mike on 3/10/2016.
  */
 @Component
-@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+//@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class TokenHandler {
 
     private String token;
