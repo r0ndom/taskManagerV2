@@ -3,6 +3,7 @@ package ua.pb.task.manager.service;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.services.gmail.Gmail;
 import com.google.api.services.plus.Plus;
 import com.google.api.services.plus.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,13 @@ public class AuthService {
                     .build();
             userRepository.store(user);
             createSession(user, credential);
+            sendNotification(user);
         }
+    }
+
+    //TODO create and move to mail service
+    private void sendNotification(User user) {
+
     }
 
     public String grantAuthorities() {
@@ -93,6 +100,12 @@ public class AuthService {
     private Person getPlusProfile(Credential credential) throws IOException {
         Plus plus = getPlusService(credential);
         return plus.people().get(DEFAULT_USER).execute();
+    }
+
+    private Gmail getMailService(Credential credential) {
+        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME)
+                .build();
     }
 
 

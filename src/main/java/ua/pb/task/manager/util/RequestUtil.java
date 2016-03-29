@@ -2,8 +2,9 @@ package ua.pb.task.manager.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ua.pb.task.manager.model.User;
+import ua.pb.task.manager.model.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,9 @@ import java.util.Map;
 public class RequestUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(RequestUtil.class);
+
+    @Value("${error.url}")
+    private String ERROR_URL;
 
     public Cookie getLastSessionCookieByKey(HttpServletRequest req, String cookieName) {
         LOG.debug("cookieName {}: ", cookieName);
@@ -78,5 +82,14 @@ public class RequestUtil {
             sessionKey = (sessionCookie != null) ? sessionCookie.getValue() : null;
         }
         return sessionKey;
+    }
+
+    public String getErrorUrl(ua.pb.task.manager.model.Error error) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(ERROR_URL);
+        builder.append("?").append("ref").append(error.getRef());
+        builder.append("&").append("type").append(error.getType());
+        builder.append("&").append("message").append(error.getMessage());
+        return builder.toString();
     }
 }
