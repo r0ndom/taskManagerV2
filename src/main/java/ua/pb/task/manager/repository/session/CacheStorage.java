@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Mednikov on 25.03.2016.
  */
 //TODO need to replace this impl to ehcache and understand how to use with spring
+    //we can store session in http
 @Repository
 public class CacheStorage<T> implements Storage<T> {
 

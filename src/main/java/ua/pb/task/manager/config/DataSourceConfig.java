@@ -46,7 +46,7 @@ public class DataSourceConfig {
     public SqlSessionFactory sessionFactory() throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource());
-        sessionFactoryBean.setTypeAliasesPackage("ua.pb.task.manager.model");
+        sessionFactoryBean.setTypeAliasesPackage("ua.pb.task.manager.mapper");
         sessionFactoryBean.setMapperLocations(context.getResources("classpath:mapper/*.xml"));
         return sessionFactoryBean.getObject();
     }

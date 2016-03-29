@@ -1,15 +1,13 @@
 package ua.pb.task.manager.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.*;
 import ua.pb.task.manager.service.AuthService;
-import ua.pb.task.manager.util.TokenHandler;
+import ua.pb.task.manager.model.TokenInfo;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -19,31 +17,22 @@ import java.io.IOException;
 public class AuthController {
 
     @Autowired
-    private TokenHandler tokenHandler;
-
-    @Autowired
     private AuthService authService;
 
     @RequestMapping(value = "/auth", method = RequestMethod.GET)
-    public String googleAuth(HttpServletRequest request) {
-        String error = request.getParameter("error");
-        String code = request.getParameter("code");
-        tokenHandler.setData(code, error);
-        return "redirect:/";
+    @ResponseStatus(HttpStatus.OK)
+    public void googleAuth(TokenInfo info) throws IOException {
+        authService.auth(info);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public void signIn() throws IOException {
-        authService.auth();
-    }
-
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void signUp() throws IOException {
-        authService.register();
+    @ResponseBody
+    public String signIn() throws IOException {
+        return authService.grantAuthorities();
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView loginPage() {
-        return new ModelAndView("auth/login");
+    public String loginPage() {
+        return "auth/login";
     }
 }

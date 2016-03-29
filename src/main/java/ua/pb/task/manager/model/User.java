@@ -36,9 +36,15 @@ public class User
         return new User().new Builder();
     }
 
+    public boolean hasRole(Role role) {
+        return this.roles.contains(role);
+    }
 
     //TODO fix this dirty hook
     public static User newInstance(List<UserDto> list) {
+        if (list.isEmpty()) {
+            return null;
+        }
         User user = new User();
         Set<String> emails = new HashSet<>();
         Set<Role> roles = new HashSet<>();

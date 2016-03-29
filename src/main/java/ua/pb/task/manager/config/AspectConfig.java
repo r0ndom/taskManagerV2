@@ -2,6 +2,7 @@ package ua.pb.task.manager.config;
 
 import org.springframework.context.annotation.*;
 import ua.pb.task.manager.aspect.impl.ExceptionAspect;
+import ua.pb.task.manager.aspect.impl.RoleAccessAspect;
 import ua.pb.task.manager.aspect.impl.SessionAccessAspect;
 
 /**
@@ -21,5 +22,10 @@ public class AspectConfig {
     @Bean
     public ExceptionAspect exceptionAspect() {
         return new ExceptionAspect();
+    }
+
+    @Bean
+    public RoleAccessAspect roleAccessAspect() {
+        return new RoleAccessAspect();
     }
 }

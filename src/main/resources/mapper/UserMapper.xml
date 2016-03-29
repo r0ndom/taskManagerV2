@@ -10,7 +10,7 @@
         <result property="role" column="roles.role" javaType="ua.pb.task.manager.model.Role" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
     </resultMap>
 
-    <select id="findUserByEmail" resultMap="getUserDtoResultMap">
+    <select id="findByEmail" resultMap="getUserDtoResultMap">
         select * from USERS users
         INNER JOIN EMAILS emails
         on users.id = emails.user_id
@@ -24,16 +24,14 @@
     </insert>
 
     <insert id="storeRoles" parameterType="ua.pb.task.manager.model.User">
-        INSERT ALL
         <foreach item="role" index="index" collection="roles">
-            INTO ROLES (user_id, role) VALUES (#{id}, #{role})
+            INSERT INTO ROLES (user_id, role) VALUES (#{id}, #{role});
         </foreach>
     </insert>
 
     <insert id="storeEmails" parameterType="ua.pb.task.manager.model.User">
-        INSERT ALL
         <foreach item="email" index="index" collection="emails">
-            INTO EMAILS (user_id, email) VALUES (#{id}, #{email})
+            INSERT INTO EMAILS (user_id, email) VALUES (#{id}, #{email});
         </foreach>
     </insert>
 

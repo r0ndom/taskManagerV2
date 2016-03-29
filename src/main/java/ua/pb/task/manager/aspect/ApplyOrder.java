@@ -7,7 +7,9 @@ public class ApplyOrder {
 
     public static final int AUTH = 1;
 
-    public static final int EXCEPTION = 2;
+    public static final int CHECK_ROLE = 2;
+
+    public static final int EXCEPTION = 3;
 
 
 }

@@ -12,25 +12,17 @@ import com.google.api.client.json.JsonFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ua.pb.task.manager.util.TokenHandler;
+import ua.pb.task.manager.model.TokenInfo;
 
-import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 
 /**
  * Created by Mednikov on 25.03.2016.
  */
 @Service
 public class GoogleCredentialStorage {
-
-    @Autowired
-    private TokenHandler handler;
-    @Autowired
-    private HttpServletResponse response;
 
     @Value("${redirect.url}")
     private String REDIRECT_URL;
@@ -44,21 +36,22 @@ public class GoogleCredentialStorage {
     @Autowired
     private GoogleAuthorizationCodeFlow flow;
 
+    //TODO thinking about to fix this method in null-case
     public Credential load(Long id) throws IOException {
         Credential credential = flow.loadCredential(String.valueOf(id));
-        return isCredentialValid(credential) ? credential : createAndStore(id);
+        return isCredentialValid(credential) ? credential : null;
     }
 
-    public Credential createAndStore(Long id) throws IOException {
-        return flow.createAndStoreCredential(getTokenResponse(), String.valueOf(id));
+    public Credential createAndStore(Long id, String token) throws IOException {
+        return flow.createAndStoreCredential(getTokenResponse(token), String.valueOf(id));
     }
 
-    public Credential getNewInstance() throws IOException {
+    public Credential getNewInstance(String token) throws IOException {
         return new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT)
                 .setJsonFactory(JSON_FACTORY)
                 .setClientSecrets(getSecrets())
                 .build()
-                .setFromTokenResponse(getTokenResponse());
+                .setFromTokenResponse(getTokenResponse(token));
     }
 
 
@@ -78,27 +71,15 @@ public class GoogleCredentialStorage {
         return GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
     }
 
-    private TokenResponse getTokenResponse() throws IOException {
+    public String getAuthUrl() {
         AuthorizationCodeRequestUrl authorizationUrl =
                 flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URL);
 
-        //response.sendRedirect(authorizationUrl.build());
+        return authorizationUrl.build();
+    }
 
-        try {
-            if (Desktop.isDesktopSupported()) {
-                Desktop desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    System.out.println("Attempting to open that address in the default browser now...");
-                    desktop.browse(URI.create(authorizationUrl.build()));
-                }
-            }
-        } catch (IOException e) {
-        } catch (InternalError e) {
-
-        }
-
-        String code = handler.getToken();
-        return flow.newTokenRequest(code).setRedirectUri(REDIRECT_URL).execute();
+    private TokenResponse getTokenResponse(String token) throws IOException {
+        return flow.newTokenRequest(token).setRedirectUri(REDIRECT_URL).execute();
     }
 
     private boolean isCredentialValid(Credential credential) {

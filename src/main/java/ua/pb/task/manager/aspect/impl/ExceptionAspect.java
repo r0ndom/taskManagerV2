@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import ua.pb.task.manager.aspect.ApplyOrder;
-import ua.pb.task.manager.model.User;
+import ua.pb.task.manager.model.*;
+import ua.pb.task.manager.model.Error;
 import ua.pb.task.manager.repository.session.SessionStorage;
 import ua.pb.task.manager.util.RequestUtil;
 
@@ -28,54 +27,53 @@ public class ExceptionAspect {
     private static final Logger LOG = LoggerFactory.getLogger(RequestUtil.class);
 
     @Autowired
-    private SessionStorage<Long> sessionStorage;
+    private SessionStorage<UserSession> sessionStorage;
 
-//    @Autowired
-//    private HttpServletRequest req;
-//
-//    @Autowired
-//    private HttpServletResponse resp;
+    @Autowired
+    private HttpServletRequest req;
+
+    @Autowired
+    private HttpServletResponse resp;
 
     @Autowired
     private RequestUtil requestUtil;
-
-    @Value("${error.url}")
-    private String REDIRECT_URL;
 
     @Pointcut("within(@org.springframework.stereotype.Controller *)")
     public void controller() {
     }
 
     @Around("controller()")
-    public void logAfterThrowing(ProceedingJoinPoint pjp) throws Throwable {
-
+    public Object logAfterThrowing(ProceedingJoinPoint pjp) throws Throwable {
+        Object result = null;
         try {
-            pjp.proceed();
+            result = pjp.proceed();
         } catch (Exception e) {
             String message = e.getMessage();
             sendError(message, e);
             e.printStackTrace();
         }
+        return result;
     }
 
     private void sendError(String message, Exception e) throws IOException {
-        Long id = getUserByCookie();
+        UserSession session = getUserByCookie();
 
-        LOG.error("User data:" + (id != null ? id : "user = null"));
+        LOG.error("User data:" + (session != null ? session : "user = null"));
 
         String uid = UUID.randomUUID().toString();
         String exception = e.getClass().getSimpleName();
 
-        LOG.error("Error:" + exception + ":" + message + ":" + uid);
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-        response.sendRedirect(REDIRECT_URL);
+        Error error = new Error(uid, exception, message);
+
+        LOG.error("Error: {}", error);
+
+        resp.sendRedirect(requestUtil.getErrorUrl(error));
 
     }
 
-    private Long getUserByCookie() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        Cookie sessionCookie = requestUtil.getLastSessionCookieByKey(request, User.USER_KEY_NAME_COOKIE);
-        String key = requestUtil.getSessionKeyByCookieOrAttribute(request, sessionCookie);
+    private UserSession getUserByCookie() {
+        Cookie sessionCookie = requestUtil.getLastSessionCookieByKey(req, User.USER_KEY_NAME_COOKIE);
+        String key = requestUtil.getSessionKeyByCookieOrAttribute(req, sessionCookie);
         return (key != null) ? sessionStorage.getObject(key) : null;
     }
 }

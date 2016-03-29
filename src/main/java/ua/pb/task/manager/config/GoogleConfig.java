@@ -50,7 +50,7 @@ public class GoogleConfig {
 
     @Bean
     public GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow() throws IOException, GeneralSecurityException {
-        List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, PlusScopes.USERINFO_PROFILE, SPREADSHEETS_URL, GmailScopes.MAIL_GOOGLE_COM);
+        List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, PlusScopes.USERINFO_EMAIL, SPREADSHEETS_URL, GmailScopes.MAIL_GOOGLE_COM);
 
         InputStream in = AuthService.class.getResourceAsStream("/client_secret.json");
         GoogleClientSecrets clientSecrets =
