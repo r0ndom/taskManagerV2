@@ -8,8 +8,10 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.plus.PlusScopes;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,16 +51,25 @@ public class GoogleConfig {
         return JacksonFactory.getDefaultInstance();
     }
 
-    @Bean
-    public GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow() throws IOException, GeneralSecurityException {
-        List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, PlusScopes.USERINFO_EMAIL, SPREADSHEETS_URL, GmailScopes.MAIL_GOOGLE_COM);
+    @Bean(name = "userScopes")
+    public GoogleAuthorizationCodeFlow googleUsersAuthorizationCodeFlow() throws IOException, GeneralSecurityException {
+        List<String> SCOPES = Collections.singletonList(PlusScopes.USERINFO_EMAIL);
+        return googleAuthorizationCodeFlow(SCOPES);
+    }
 
+    @Bean(name = "adminScopes")
+    public GoogleAuthorizationCodeFlow googleAdminAuthorizationCodeFlow() throws IOException, GeneralSecurityException {
+        List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, PlusScopes.USERINFO_EMAIL, SPREADSHEETS_URL);
+        return googleAuthorizationCodeFlow(SCOPES);
+    }
+
+    private GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow(List<String> scopes) throws IOException, GeneralSecurityException {
         InputStream in = AuthService.class.getResourceAsStream("/client_secret.json");
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(jsonFactory(), new InputStreamReader(in));
 
         return new GoogleAuthorizationCodeFlow.Builder(
-                httpTransport(), jsonFactory(), clientSecrets, SCOPES)
+                httpTransport(), jsonFactory(), clientSecrets, scopes)
                 .setDataStoreFactory(memoryDataStoreFactory())
                 .setAccessType("offline")
                 .build();

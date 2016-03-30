@@ -67,6 +67,9 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private SessionStorage<UserSession> sessionStorage;
 
     public void auth(TokenInfo info) throws IOException {
@@ -83,14 +86,9 @@ public class AuthService {
                     .addRole(getRole())
                     .build();
             userRepository.store(user);
+            emailService.approveUser(user.getMainEmail());
             createSession(user, credential);
-            sendNotification(user);
         }
-    }
-
-    //TODO create and move to mail service
-    private void sendNotification(User user) {
-
     }
 
     public String grantAuthorities() {
@@ -100,12 +98,6 @@ public class AuthService {
     private Person getPlusProfile(Credential credential) throws IOException {
         Plus plus = getPlusService(credential);
         return plus.people().get(DEFAULT_USER).execute();
-    }
-
-    private Gmail getMailService(Credential credential) {
-        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
     }
 
 

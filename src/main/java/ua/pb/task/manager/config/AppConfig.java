@@ -9,7 +9,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @ComponentScan(basePackages = {"ua.pb.task.manager.repository", "ua.pb.task.manager.form",
         "ua.pb.task.manager.service", "ua.pb.task.manager.util"})
-@Import({ActivitiConfig.class, DataSourceConfig.class, GoogleConfig.class})
+@Import({ActivitiConfig.class, DataSourceConfig.class, GoogleConfig.class, EmailConfig.class})
 public class AppConfig {
 
     @Bean

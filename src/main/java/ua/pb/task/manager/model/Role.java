@@ -7,7 +7,7 @@ public enum Role  {
     ROLE_ADMIN("Администратор"),
     ROLE_TESTER("Тестировщик"),
     ROLE_GUEST("Гость"),
-    ROLE_CONTROL("Control");
+    ROLE_CONTROL("Администратор приложения");
 
     private final String roleViewName;
 

@@ -10,6 +10,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.pb.task.manager.model.TokenInfo;
@@ -34,6 +35,7 @@ public class GoogleCredentialStorage {
     private HttpTransport HTTP_TRANSPORT;
 
     @Autowired
+    @Qualifier("userScopes")
     private GoogleAuthorizationCodeFlow flow;
 
     //TODO thinking about to fix this method in null-case

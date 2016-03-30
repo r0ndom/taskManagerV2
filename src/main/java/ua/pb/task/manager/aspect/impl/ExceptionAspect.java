@@ -66,8 +66,9 @@ public class ExceptionAspect {
         Error error = new Error(uid, exception, message);
 
         LOG.error("Error: {}", error);
-
-        resp.sendRedirect(requestUtil.getErrorUrl(error));
+        //TODO undrestand how to redirect to error service
+        //how to handle from js
+        //resp.sendRedirect(requestUtil.getErrorUrl(error));
 
     }
 

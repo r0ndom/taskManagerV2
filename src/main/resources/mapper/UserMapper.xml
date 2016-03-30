@@ -19,6 +19,23 @@
         WHERE emails.email = #{email}
     </select>
 
+    <select id="findAll" resultMap="getUserDtoResultMap">
+        select * from USERS users
+        INNER JOIN EMAILS emails
+        on users.id = emails.user_id
+        INNER JOIN ROLES roles
+        on  users.id = roles.user_id
+    </select>
+
+    <select id="findByRole" resultMap="getUserDtoResultMap">
+        select * from USERS users
+        INNER JOIN EMAILS emails
+        on users.id = emails.user_id
+        INNER JOIN ROLES roles
+        on  users.id = roles.user_id
+        WHERE roles.role = #{role}
+    </select>
+
     <insert id="storeUser" parameterType="ua.pb.task.manager.model.User">
         INSERT INTO USERS(ID) VALUES (#{id});
     </insert>
@@ -34,5 +51,17 @@
             INSERT INTO EMAILS (user_id, email) VALUES (#{id}, #{email});
         </foreach>
     </insert>
+
+    <delete id="deleteUser">
+        DELETE FROM USERS WHERE id=#{id};
+    </delete>
+
+    <delete id="deleteEmail">
+        DELETE FROM EMAILS WHERE user_id=#{userId};
+    </delete>
+
+    <delete id="deleteRole">
+        DELETE FROM ROLES WHERE user_id=#{userId};
+    </delete>
 
 </mapper>

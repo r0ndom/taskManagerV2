@@ -32,12 +32,25 @@ public class User
         return roles;
     }
 
+    public String getMainEmail() {
+        return emails.iterator().next();
+    }
+
     public static Builder newBuilder() {
         return new User().new Builder();
     }
 
     public boolean hasRole(Role role) {
         return this.roles.contains(role);
+    }
+
+    //for json purposes
+    public Set<String> getStringRoles() {
+        Set<String> result = new HashSet<>();
+        for (Role role : roles) {
+            result.add(role.getRoleViewName());
+        }
+        return result;
     }
 
     //TODO fix this dirty hook
@@ -56,6 +69,32 @@ public class User
         user.emails = emails;
         user.roles = roles;
         return user;
+    }
+
+    //TODO need to create user factory
+    public static List<User> newList(List<UserDto> list) {
+        if (list.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<User> result = new ArrayList<>();
+        for (UserDto aList : list) {
+            User user = new User();
+            user.emails = new HashSet<>();
+            user.roles = new HashSet<>();
+            user.id = aList.getId();
+            if (!result.contains(user)) {
+                result.add(user);
+            }
+        }
+        for (User user : result) {
+            for (UserDto dto : list) {
+                if (user.getId().equals(dto.getId())) {
+                    user.roles.add(dto.getRole());
+                    user.emails.add(dto.getEmail());
+                }
+            }
+        }
+        return result;
     }
 
     public class Builder {

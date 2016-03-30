@@ -12,9 +12,9 @@ public interface UserMapper {
     void storeEmails(User user);
     void storeRoles(User user);
     List<UserDto> findByEmail(String email);
-//    User load(String id);
-//    void update(User user);
-//    void delete(String id);
-//    List<User> findAll();
-//    List<User> findByRole(Role role);
+    List<UserDto> findByRole(Role role);
+    void deleteEmail(Long userId);
+    void deleteRole(Long userId);
+    void deleteUser(Long id);;
+    List<UserDto> findAll();
 }

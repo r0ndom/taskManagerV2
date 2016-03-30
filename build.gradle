@@ -40,6 +40,9 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-tx', version:springVersion
     compile group: 'org.springframework', name: 'spring-aspects', version:springVersion
 
+    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+
+    compile 'javax.mail:mail:1.4'
 
     compile 'com.google.gdata:core:1.47.1'
     compile 'com.google.api-client:google-api-client:1.20.0'
