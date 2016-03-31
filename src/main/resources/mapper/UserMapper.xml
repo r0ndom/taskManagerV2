@@ -19,6 +19,15 @@
         WHERE emails.email = #{email}
     </select>
 
+    <select id="findById" resultMap="getUserDtoResultMap">
+        select * from USERS users
+        INNER JOIN EMAILS emails
+        on users.id = emails.user_id
+        INNER JOIN ROLES roles
+        on  users.id = roles.user_id
+        WHERE users.id = #{id}
+    </select>
+
     <select id="findAll" resultMap="getUserDtoResultMap">
         select * from USERS users
         INNER JOIN EMAILS emails
@@ -41,6 +50,12 @@
     </insert>
 
     <insert id="storeRoles" parameterType="ua.pb.task.manager.model.User">
+        <foreach item="role" index="index" collection="roles">
+            INSERT INTO ROLES (user_id, role) VALUES (#{id}, #{role});
+        </foreach>
+    </insert>
+
+    <insert id="addRoles" parameterType="java.util.Map">
         <foreach item="role" index="index" collection="roles">
             INSERT INTO ROLES (user_id, role) VALUES (#{id}, #{role});
         </foreach>

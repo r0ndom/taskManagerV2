@@ -1,5 +1,10 @@
 package ua.pb.task.manager.model;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 //TODO thinking about to fill enum from property file
 public enum Role  {
     ROLE_DEVELOPER("Разработчик"),
@@ -25,7 +30,32 @@ public enum Role  {
     }
 
 
-    public static Role[] getPermittedValues() {
-        return new Role[] {ROLE_ADMIN, ROLE_DEVELOPER, ROLE_MANAGER, ROLE_TESTER, ROLE_GUEST};
+    public static Set<Role> getPermittedValues() {
+        Role[] roles = new Role[] {ROLE_ADMIN, ROLE_DEVELOPER, ROLE_MANAGER, ROLE_TESTER, ROLE_GUEST};
+        return new HashSet<Role>(Arrays.asList(roles));
+    }
+
+    public static Role getRole(String value) {
+        Set<Role> roles = getPermittedValues();
+        for (Role role : roles) {
+            if (role.getRoleViewName().equals(value)) {
+                return role;
+            }
+        }
+        return null;
+    }
+
+    public static Set<Role> getRoles(List<String> roles) {
+        Set<Role> result = new HashSet<>();
+        for (String role : roles) {
+            result.add(getRole(role));
+        }
+        return result;
+    }
+
+    public static Set<Role> getAcceptedRoles(Set<Role> roles) {
+        Set<Role> temp = getPermittedValues();
+        temp.removeAll(roles);
+        return temp;
     }
 }

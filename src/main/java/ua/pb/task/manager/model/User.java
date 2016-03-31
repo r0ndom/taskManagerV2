@@ -72,6 +72,8 @@ public class User
     }
 
     //TODO need to create user factory
+
+    //TODO create user service and refactor this two methods above
     public static List<User> newList(List<UserDto> list) {
         if (list.isEmpty()) {
             return Collections.emptyList();
@@ -82,7 +84,7 @@ public class User
             user.emails = new HashSet<>();
             user.roles = new HashSet<>();
             user.id = aList.getId();
-            if (!result.contains(user)) {
+            if (!contains(result, user.getId())) {
                 result.add(user);
             }
         }
@@ -95,6 +97,15 @@ public class User
             }
         }
         return result;
+    }
+
+    private static boolean contains(List<User> list, Long id) {
+        for (User user : list) {
+            if (user.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public class Builder {

@@ -5,12 +5,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ua.pb.task.manager.model.Role;
+import ua.pb.task.manager.model.dto.AddRoleRequest;
 import ua.pb.task.manager.model.dto.UserDto;
 import ua.pb.task.manager.repository.mapper.UserMapper;
 import ua.pb.task.manager.model.User;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mednikov on 25.03.2016.
@@ -63,9 +63,30 @@ public class UserRepository {
         }
     }
 
+    public User find(Long id) {
+        return User.newInstance(mapper.findById(id));
+    }
+
 
     public List<User> findAll() {
         return User.newList(mapper.findAll());
+    }
+
+    //TODO add role util
+    public Set<String> getAcceptedRoles(Long id) {
+        User user = find(id);
+        Set<String> strRoles = new HashSet<>();
+        Set<Role> roles = Role.getAcceptedRoles(user.getRoles());
+        for (Role role : roles) {
+            strRoles.add(role.getRoleViewName());
+        }
+        return strRoles;
+    }
+
+    public void addRoles(AddRoleRequest request) {
+        Long id = request.getUserId();
+        Set<Role> roles = Role.getRoles(request.getRoles());
+        mapper.addRoles(id, roles);
     }
 
 }
