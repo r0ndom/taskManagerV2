@@ -16,11 +16,11 @@ ext {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url "http://nexus.ceb.loc:8081/nexus/content/groups/libs-release/" }
-    maven { url "http://nexus.ceb.loc:8081/nexus/content/groups/libs-snapshot/" }
+//    maven { url "http://nexus.ceb.loc:8081/nexus/content/groups/libs-release/" }
+//    maven { url "http://nexus.ceb.loc:8081/nexus/content/groups/libs-snapshot/" }
 }
 dependencies {
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.37'
+    //compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.37'
     compile group: 'jstl', name: 'jstl', version:'1.2'
     compile group: 'javax.servlet', name: 'servlet-api', version:'2.5'
     compile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.0.1'
