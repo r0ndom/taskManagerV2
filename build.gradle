@@ -9,6 +9,11 @@ description = "taskManager"
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+war{
+ archiveName = 'ROOT.war'
+ destinationDir = file('webapps')
+}
+
 ext {
     springVersion = '4.2.1.RELEASE';
 }
