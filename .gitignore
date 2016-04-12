@@ -1,7 +1,7 @@
 .idea/
 *.iml
 /target/
-db.properties
+#db.properties
 /build/
 /classes/
 /out/
