@@ -10,7 +10,7 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 war{
- archiveName = 'ROOT.war'
+ archiveName = '123.war'
  destinationDir = file('webapps')
 }
 
