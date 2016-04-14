@@ -38,7 +38,7 @@ remotes {
 task deploy << {
     ssh.run {
         session(remotes.webServer) {
-            put from: 'ROOT.war', into: 'jbossews/webapps'
+            put from: 'webapps/ROOT.war', into: 'jbossews/webapps'
             execute 'sudo service tomcat restart'
         }
     }
