@@ -82,7 +82,7 @@ public class DataSourceConfig {
     }
 
     private String getRemoteUrl() {
-        return "db:postgresql://" + REMOTE_HOST + ":" + REMOTE_PORT;
+        return "db:postgresql://" + REMOTE_HOST + ":" + REMOTE_PORT + "/" + "taskmanager";
     }
 
 }
