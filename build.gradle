@@ -31,7 +31,9 @@ repositories {
 
 remotes {
     webServer {
-        host = '570d227589f5cfe9a90001cf@taskmanager-privatbank.rhcloud.com'
+        host = 'taskmanager-privatbank.rhcloud.com'
+        user = '570d227589f5cfe9a90001cf'
+        identity = file('id_rsa')
     }
 }
 
