@@ -22,10 +22,6 @@ ext {
     springVersion = '4.2.1.RELEASE';
 }
 
-plugins {
-    id 'org.hidetake.ssh' version '2.0.0'
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -33,22 +29,6 @@ repositories {
 //    maven { url "http://nexus.ceb.loc:8081/nexus/content/groups/libs-snapshot/" }
 }
 
-remotes {
-    webServer {
-        host = 'taskmanager-privatbank.rhcloud.com'
-        user = '570d227589f5cfe9a90001cf'
-        identity = file('id_rsa')
-    }
-}
-
-task deploy << {
-    ssh.run {
-        session(remotes.webServer) {
-            put from: 'webapps/ROOT.war', into: 'jbossews/webapps'
-            execute 'sudo service tomcat restart'
-        }
-    }
-}
 dependencies {
     //compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.37'
     compile group: 'jstl', name: 'jstl', version:'1.2'
