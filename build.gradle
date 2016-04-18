@@ -1,3 +1,7 @@
+plugins {
+    id 'org.hidetake.ssh' version '2.0.0'
+}
+
 apply plugin: 'java'
 apply plugin: 'war'
 
@@ -9,6 +13,7 @@ description = "taskManager"
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+
 war{
  archiveName = 'ROOT.war'
  destinationDir = file('webapps')
@@ -18,10 +23,6 @@ ext {
     springVersion = '4.2.1.RELEASE';
 }
 
-plugins {
-    id 'org.hidetake.ssh' version '2.0.0'
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -29,9 +30,12 @@ repositories {
 //    maven { url "http://nexus.ceb.loc:8081/nexus/content/groups/libs-snapshot/" }
 }
 
+
 remotes {
     webServer {
-        host = '570d227589f5cfe9a90001cf@taskmanager-privatbank.rhcloud.com'
+        host = 'taskmanager-privatbank.rhcloud.com'
+        user = '570d227589f5cfe9a90001cf'
+        identity = '570d227589f5cfe9a90001cf'
     }
 }
 
