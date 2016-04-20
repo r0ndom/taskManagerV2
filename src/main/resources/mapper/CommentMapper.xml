@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ua.pb.task.manager.repository.mapper.CommentMapper" >
+
+    <resultMap id="getComment" type="ua.pb.task.manager.model.Comment">
+        <id property="id" column="ID"/>
+        <result property="taskId" column="TASK_ID"/>
+        <result property="ldap" column="LDAP"/>
+        <result property="text" column="TEXT"/>
+        <result property="date" column="DATE"/>
+    </resultMap>
+
+    <select id="findByTaskId" resultMap="getComment">
+        select * from comments where TASK_ID = #{id};
+    </select>
+
+    <insert id="create" parameterType="ua.pb.task.manager.model.Comment">
+        INSERT INTO comments(TASK_ID, LDAP, TEXT, DATE) VALUES (#{taskId}, #{ldap}, #{text}, #{date});
+    </insert>
+
+    <update id="update" parameterType="ua.pb.task.manager.model.Comment">
+        UPDATE comments SET TASK_ID=#{taskId}, LDAP=#{ldap}, TEXT=#{text}, DATE=#{date} WHERE ID=#{id};
+    </update>
+
+    <delete id="delete">
+        delete from comments where id=#{id};
+    </delete>
+
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ua.pb.task.manager.repository.mapper.FilterMapper" >
+
+    <resultMap id="taskResultMap" type="ua.pb.task.manager.model.TaskDto">
+        <id property="activitiDynamicId" column="task.id_"/>
+        <result property="id" column="task.execution_id_"/>
+        <result property="key" column="var.name_"/>
+        <result property="value" column="var.text_"/>
+        <!--<collection property="params">-->
+            <!--<result property="key" column="var.name_"/>-->
+            <!--<result property="value" column="var.text_"/>-->
+        <!--</collection>-->
+    </resultMap>
+
+    <select id="search" resultMap="taskResultMap" parameterType="ua.pb.task.manager.model.filter.TaskSearchFilter">
+        SELECT
+        SELECT task.id_, task.execution_id_, var.name_, var.text_
+        FROM act_ru_task task, act_ru_variable var
+        WHERE task.execution_id_ = var.execution_id_
+        <where>
+            <if test="status != null and status != ''">AND var.name_ = 'status' AND var.text_ = #{status}</if>
+            <if test="executor != null and executor != ''">AND var.name_ = 'executor' AND var.text_ = #{executor}</if>
+            <if test="author != null and author != ''">AND var.name_ = 'author' AND var.text_ = #{author}</if>
+        </where>
+    </select>
+ </mapper>

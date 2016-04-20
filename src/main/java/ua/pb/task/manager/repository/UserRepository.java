@@ -89,4 +89,13 @@ public class UserRepository {
         mapper.addRoles(id, roles);
     }
 
+    public Map<String, String> findAllMap() {
+        Map<String, String> map = new HashMap<>();
+        List<User> list = findAll();
+        for (User user : list) {
+            map.put(user.getMainEmail(), user.toString());
+        }
+        return map;
+    }
+
 }

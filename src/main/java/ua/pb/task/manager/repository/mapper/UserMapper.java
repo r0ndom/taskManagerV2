@@ -19,7 +19,7 @@ public interface UserMapper {
     List<UserDto> findById(Long userId);
     void deleteEmail(Long userId);
     void deleteRole(Long userId);
-    void deleteUser(Long id);;
+    void deleteUser(Long id);
     List<UserDto> findAll();
     void addRoles(@Param("id")Long id, @Param("roles")Set<Role> roles);
 }

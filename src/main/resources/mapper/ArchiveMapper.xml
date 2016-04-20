@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ua.pb.task.manager.repository.mapper.ArchiveMapper" >
+
+    <resultMap id="getArchive" type="ua.pb.task.manager.model.Archive">
+        <id property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="executor" column="EXECUTOR"/>
+        <result property="author" column="AUTHOR"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+
+    <insert id="put" parameterType="ua.pb.task.manager.model.TaskData">
+        insert into archive(id, name, description, executor, author, status)
+        values(#{id}, #{params.name}, #{params.description}, #{params.executor}, #{params.author}, #{params.status});
+    </insert>
+
+    <select id="findAll" resultMap="getArchive">
+        select * from archive;
+    </select>
+
+
+</mapper>

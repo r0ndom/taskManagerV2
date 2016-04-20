@@ -111,7 +111,7 @@ public class AuthService {
         storage.store(user.getId(), credential);
         String sessionKey = sessionStorage.storeObject(UserSession.build(user));
         requestUtil.updateOrCreateSessionKey(request, response, User.USER_KEY_NAME_COOKIE, sessionKey, "/");
-        response.sendRedirect(user.hasRole(Role.ROLE_CONTROL) ? ADMIN_URL : REDIRECT_URL);
+        response.sendRedirect(user.hasRole(Role.ROLE_CONTROL) ? ADMIN_URL : REDIRECT_URL + "/app/tasks");
     }
 
     private Role getRole() {

@@ -2,9 +2,11 @@ package ua.pb.task.manager.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.pb.task.manager.model.*;
+import ua.pb.task.manager.repository.session.SessionStorage;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +21,9 @@ import java.util.Map;
  */
 @Component
 public class RequestUtil {
+
+    @Autowired
+    private SessionStorage<UserSession> sessionStorage;
 
     private static final Logger LOG = LoggerFactory.getLogger(RequestUtil.class);
 
@@ -91,5 +96,11 @@ public class RequestUtil {
         builder.append("&").append("type").append(error.getType());
         builder.append("&").append("message").append(error.getMessage());
         return builder.toString();
+    }
+
+    public UserSession getUserSession(HttpServletRequest request) {
+        Cookie cookie = getLastSessionCookieByKey(request, User.USER_KEY_NAME_COOKIE);
+        String key = getSessionKeyByCookieOrAttribute(request, cookie);
+        return sessionStorage.getObject(key);
     }
 }
